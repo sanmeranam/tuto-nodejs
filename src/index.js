@@ -1,55 +1,24 @@
+const axios = require('axios');
 const fs = require('fs');
+const _ = require('lodash');
 
-const readFile = (path) => {
-    return new Promise((success, failure) => {
-        try {
-            const dd = fs.readFileSync(path, 'utf8');
-            success(dd);
-        } catch (error) {
-            failure(error);
-        }
-        // fs.readFile(path, 'utf8', (err, data) => {
-        //     if (err) failure(err);
-        //     success(data);
-        // });
-    })
-}
-
-
-const writeFile = (path, data) => {
-    return new Promise((success, failure) => {
-        fs.writeFile(path, data, (err) => {
-            if (err) failure(err);
-            success('File written successfully');
-        });
+const saveAsJsonFIle = async (data) => {
+    try {
+        await fs.promises.writeFile('data.json', JSON.stringify(data, null, 2));
+        console.log('Data saved to data.json');
+    } catch (error) {
+        console.error(error);
     }
-    )
 }
+    
 
-
-const useState = (def) => {
-    let val = def;
-    const setVal = (newVal) => {
-        console.log('Setting new value: ', newVal);
-        val = newVal;
+const getPosts = async () => {
+    try {
+        const { data } = await axios.get('https://jsonplaceholder.typicode.com/posts');
+        await saveAsJsonFIle(_.map(data,'title'));
+        console.log(data);
+    } catch (error) {
+        console.error(error);
     }
-    return [val, setVal]
 }
-
-
-
-const initApp = async () => {
-    console.log('App is initializing...');
-    const [a,setA] = useState(4)
-    console.log(a);
-    setA(5);
-    console.log(a);
-
-    // console.log('App is initializing...');
-    // const data = await readFile('/Users/santanu.sahu/Documents/tapan/node-project/test/app.txt');
-    // console.log(data);
-}
-
-
-
-initApp();
+getPosts();
