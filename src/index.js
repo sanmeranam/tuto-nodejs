@@ -1,13 +1,17 @@
 require('dotenv').config();
 const express = require('express');
+const path =  require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const router = require('./router');
+const { getSystemConfig, createSystemConfig } = require('./dbConnect');
 
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+//express static
+app.use(express.static(path.join(__dirname, 'dist')));
 // app.use((req, res, next) => {
 //   req.name = "Rahul";
 //   next();
@@ -27,10 +31,15 @@ app.use(bodyParser.json());
 //   next();
 // }
 
-// app.get('/api/user', _mml, _mml, _mml, (req, res) => {
-//   const { name } = req.query;
-//   res.send(`Hello World! ${name}`);
-// })
+app.get('/api/system', async (req, res) => {
+  const systems = await getSystemConfig(req.query);
+  res.json(systems);
+})
+
+app.post('/api/system', async (req, res) => {
+  const result = await createSystemConfig(req.body);
+  res.json(result);
+})
 
 
 
